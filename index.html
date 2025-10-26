@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Admin Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+        .login-container { 
+            background: white; padding: 40px; border-radius: 15px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); width: 400px; 
+        }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo h1 { color: #2c3e50; margin-bottom: 10px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
+        input { 
+            width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; 
+            font-size: 16px; transition: border-color 0.3s; 
+        }
+        input:focus { outline: none; border-color: #667eea; }
+        .btn { 
+            background: #667eea; color: white; border: none; padding: 15px; 
+            border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; 
+            transition: background 0.3s; 
+        }
+        .btn:hover { background: #764ba2; }
+        .message { 
+            padding: 10px; border-radius: 5px; margin: 15px 0; text-align: center; 
+            display: none;
+        }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .setup-info {
+            background: #fff3cd; border: 1px solid #ffeaa7; color: #856404;
+            padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>🔒 Admin Login</h1>
+            <p>Secure Link Management System</p>
+        </div>
+        
+        <div id="message" class="message"></div>
+        
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="Enter admin username" value="superadmin">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Enter admin password" value="admin123">
+        </div>
+        
+        <button class="btn" onclick="login()">🚪 Login</button>
+        
+        <div class="setup-info">
+            <strong>Default Credentials:</strong><br>
+            Username: <code>superadmin</code><br>
+            Password: <code>admin123</code><br>
+            <small>Change password after first login</small>
+        </div>
+    </div>
+
+    <script>
+        class AdminAuth {
+            constructor() {
+                this.superAdmin = JSON.parse(localStorage.getItem('superAdmin'));
+                this.admins = JSON.parse(localStorage.getItem('admins')) || {};
+                
+                // First time setup - create default credentials
+                if (!this.superAdmin) {
+                    this.setupSuperAdmin();
+                }
+                
+                // Check if already logged in
+                const currentSession = JSON.parse(sessionStorage.getItem('adminSession'));
+                if (currentSession && currentSession.loggedIn) {
+                    window.location.href = 'dashboard.html';
+                }
+            }
+            
+            setupSuperAdmin() {
+                // Simple password storage without complex hashing
+                this.superAdmin = {
+                    username: 'superadmin',
+                    password: 'admin123', // Store plain password for testing
+                    role: 'superadmin',
+                    createdAt: new Date().toISOString()
+                };
+                localStorage.setItem('superAdmin', JSON.stringify(this.superAdmin));
+                console.log('Super admin created:', this.superAdmin);
+            }
+            
+            login(username, password) {
+                console.log('Login attempt:', username, password);
+                
+                if (!username || !password) {
+                    return { success: false, message: 'Please enter both username and password' };
+                }
+                
+                // Check super admin (plain password comparison)
+                if (username === this.superAdmin.username && password === this.superAdmin.password) {
+                    sessionStorage.setItem('adminSession', JSON.stringify({
+                        loggedIn: true,
+                        username: username,
+                        role: 'superadmin',
+                        loginTime: new Date().toISOString()
+                    }));
+                    return { success: true, message: 'Super Admin login successful!' };
+                }
+                
+                // Check other admins
+                if (this.admins[username] && password === this.admins[username].password) {
+                    if (this.admins[username].isActive) {
+                        sessionStorage.setItem('adminSession', JSON.stringify({
+                            loggedIn: true,
+                            username: username,
+                            role: 'admin',
+                            loginTime: new Date().toISOString()
+                        }));
+                        return { success: true, message: 'Admin login successful!' };
+                    } else {
+                        return { success: false, message: 'This admin account is deactivated' };
+                    }
+                }
+                
+                return { success: false, message: 'Invalid username or password' };
+            }
+        }
+
+        const adminAuth = new AdminAuth();
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const result = adminAuth.login(username, password);
+            
+            const messageDiv = document.getElementById('message');
+            messageDiv.style.display = 'block';
+            messageDiv.className = result.success ? 'message success' : 'message error';
+            messageDiv.textContent = result.message;
+            
+            if (result.success) {
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+            }
+        }
+
+        // Enter key support
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                login();
+            }
+        });
+
+        // Auto-fill for testing
+        console.log('Login page loaded. Default credentials: superadmin / admin123');
+    </script>
+</body>
+</html>
