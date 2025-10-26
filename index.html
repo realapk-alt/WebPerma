@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Multi-Admin System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .login-container { 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 50px; 
+            border-radius: 20px; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2); 
+            width: 420px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+        .login-container:hover {
+            transform: translateY(-5px);
+        }
+        
+        .logo { 
+            text-align: center; 
+            margin-bottom: 40px; 
+            animation: fadeIn 1s ease;
+        }
+        .logo h1 { 
+            color: #2c3e50; 
+            margin-bottom: 10px; 
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group { 
+            margin-bottom: 25px; 
+            animation: slideIn 0.6s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        label { 
+            display: block; 
+            margin-bottom: 10px; 
+            font-weight: 600; 
+            color: #2c3e50;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        input { 
+            width: 100%; 
+            padding: 15px 20px; 
+            border: 2px solid #e8e8e8; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.8);
+        }
+        input:focus { 
+            outline: none; 
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .btn { 
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white; 
+            border: none; 
+            padding: 18px; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            width: 100%; 
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .message { 
+            padding: 15px; 
+            border-radius: 10px; 
+            margin: 20px 0; 
+            text-align: center; 
+            display: none;
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .error { 
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52); 
+            color: white; 
+            border: none;
+        }
+        .success { 
+            background: linear-gradient(45deg, #51cf66, #40c057); 
+            color: white;
+            border: none;
+        }
+        
+        .admin-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .features {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .feature-item {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-badge">🔐 Multi-Admin System</div>
+    
+    <div class="login-container">
+        <div class="logo">
+            <h1>🚀 LinkMaster Pro</h1>
+            <p style="color: #7f8c8d;">Secure Multi-Admin Link Management</p>
+        </div>
+        
+        <div id="message" class="message"></div>
+        
+        <div class="form-group">
+            <label for="username">👤 Username</label>
+            <input type="text" id="username" placeholder="Enter your username" autocomplete="username">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">🔒 Password</label>
+            <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+        </div>
+        
+        <button class="btn" onclick="login()">🎯 Login to Dashboard</button>
+        
+        <div class="features">
+            <div class="feature-item">🔐 Multi-Admin</div>
+            <div class="feature-item">🚀 Fast Redirects</div>
+            <div class="feature-item">📊 Analytics</div>
+            <div class="feature-item">⚡ Professional</div>
+        </div>
+    </div>
+
+    <script>
+        class AdminAuth {
+            constructor() {
+                this.superAdmin = JSON.parse(localStorage.getItem('superAdmin'));
+                this.admins = JSON.parse(localStorage.getItem('admins')) || {};
+                this.currentSession = JSON.parse(sessionStorage.getItem('adminSession'));
+                
+                // First time setup - create super admin
+                if (!this.superAdmin) {
+                    this.setupSuperAdmin();
+                }
+                
+                // Check if already logged in
+                if (this.currentSession && this.currentSession.loggedIn) {
+                    window.location.href = 'dashboard.html';
+                }
+            }
+            
+            setupSuperAdmin() {
+                this.superAdmin = {
+                    username: 'superadmin',
+                    password: this.hashPassword('admin123'),
+                    role: 'superadmin',
+                    createdAt: new Date().toISOString(),
+                    permissions: ['all']
+                };
+                localStorage.setItem('superAdmin', JSON.stringify(this.superAdmin));
+            }
+            
+            hashPassword(password) {
+                return btoa(password).split('').reverse().join('') + '_secure';
+            }
+            
+            login(username, password) {
+                if (!username || !password) {
+                    return { success: false, message: 'Please enter both username and password' };
+                }
+                
+                const hashedPassword = this.hashPassword(password);
+                
+                // Check super admin
+                if (username === this.superAdmin.username && hashedPassword === this.superAdmin.password) {
+                    this.createSession(username, 'superadmin');
+                    return { success: true, message: 'Super Admin login successful! 🎉' };
+                }
+                
+                // Check other admins
+                if (this.admins[username] && this.admins[username].password === hashedPassword) {
+                    if (this.admins[username].isActive) {
+                        this.createSession(username, 'admin');
+                        return { success: true, message: 'Admin login successful! 👋' };
+                    } else {
+                        return { success: false, message: 'This admin account is deactivated' };
+                    }
+                }
+                
+                return { success: false, message: 'Invalid username or password ❌' };
+            }
+            
+            createSession(username, role) {
+                sessionStorage.setItem('adminSession', JSON.stringify({
+                    loggedIn: true,
+                    username: username,
+                    role: role,
+                    loginTime: new Date().toISOString(),
+                    sessionId: this.generateSessionId()
+                }));
+            }
+            
+            generateSessionId() {
+                return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+        }
+
+        const adminAuth = new AdminAuth();
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Add loading animation
+            const btn = document.querySelector('.btn');
+            btn.innerHTML = '⏳ Authenticating...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                const result = adminAuth.login(username, password);
+                
+                const messageDiv = document.getElementById('message');
+                messageDiv.style.display = 'block';
+                messageDiv.className = result.success ? 'message success' : 'message error';
+                messageDiv.textContent = result.message;
+                
+                if (result.success) {
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } else {
+                    // Reset button
+                    btn.innerHTML = '🎯 Login to Dashboard';
+                    btn.disabled = false;
+                    
+                    // Shake animation for error
+                    messageDiv.style.animation = 'shake 0.5s ease';
+                    setTimeout(() => {
+                        messageDiv.style.animation = '';
+                    }, 500);
+                }
+            }, 1000);
+        }
+
+        // Enter key support
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                login();
+            }
+        });
+
+        // Add input animations
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
