@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Professional System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+        .login-container { 
+            background: white; padding: 40px; border-radius: 15px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); width: 400px; 
+        }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo h1 { color: #2c3e50; margin-bottom: 10px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
+        input { 
+            width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; 
+            font-size: 16px; transition: border-color 0.3s; 
+        }
+        input:focus { outline: none; border-color: #667eea; }
+        .btn { 
+            background: #667eea; color: white; border: none; padding: 15px; 
+            border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; 
+            transition: background 0.3s; 
+        }
+        .btn:hover { background: #764ba2; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .message { 
+            padding: 10px; border-radius: 5px; margin: 15px 0; text-align: center; 
+            display: none;
+        }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .status { 
+            background: #fff3cd; padding: 10px; border-radius: 5px; 
+            text-align: center; margin: 15px 0; font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>🔒 Professional Admin</h1>
+            <p>Secure Link Management System</p>
+        </div>
+        
+        <div class="status" id="status">
+            🔄 Checking backend connection...
+        </div>
+        
+        <div id="message" class="message"></div>
+        
+        <div class="form-group">
+            <label for="username">👤 Username:</label>
+            <input type="text" id="username" placeholder="Enter username" value="superadmin">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">🔒 Password:</label>
+            <input type="password" id="password" placeholder="Enter password" value="admin123">
+        </div>
+        
+        <button class="btn" onclick="login()" id="loginBtn">
+            🚪 Login to Dashboard
+        </button>
+        
+        <div style="margin-top: 20px; text-align: center;">
+            <button class="btn" style="background: #28a745; width: auto; padding: 10px 20px; margin: 5px;" onclick="testConnection()">
+                🔗 Test Connection
+            </button>
+        </div>
+        
+        <div style="margin-top: 20px; font-size: 12px; color: #666; text-align: center; background: #f8f9fa; padding: 10px; border-radius: 5px;">
+            <strong>Default Credentials:</strong><br>
+            👤 Username: <code>superadmin</code><br>
+            🔒 Password: <code>admin123</code>
+        </div>
+    </div>
+
+    <script>
+        // ✅ YEH APNA ACTUAL DEPLOYMENT URL - REPLACE KARNA HAI
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyqUNkTv0WJadUgUElvcUUxw3A7Xfa5Tlh9YR1pWoR5qjgDVrT1FKatn8jvqOp46rY6/exec';
+
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.style.display = 'block';
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.style.background = type === 'success' ? '#d4edda' : 
+                                       type === 'error' ? '#f8d7da' : '#fff3cd';
+            statusDiv.style.color = type === 'success' ? '#155724' : 
+                                   type === 'error' ? '#721c24' : '#856404';
+        }
+
+        async function testConnection() {
+            try {
+                updateStatus('🔄 Testing backend connection...', 'info');
+                
+                const response = await fetch(API_URL);
+                const result = await response.json();
+                
+                updateStatus('✅ Backend Connected: ' + result.message, 'success');
+                console.log('✅ Backend response:', result);
+                
+            } catch (error) {
+                updateStatus('❌ Connection failed: ' + error.message, 'error');
+                console.error('❌ Connection error:', error);
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            if (!username || !password) {
+                showMessage('❌ Please enter both username and password', 'error');
+                return;
+            }
+
+            loginBtn.innerHTML = '⏳ Authenticating...';
+            loginBtn.disabled = true;
+
+            try {
+                updateStatus('🔄 Logging in...', 'info');
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'login',
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const result = await response.json();
+                console.log('🔐 Login response:', result);
+
+                if (result.success) {
+                    // Store session
+                    sessionStorage.setItem('adminSession', JSON.stringify({
+                        loggedIn: true,
+                        username: result.user.username,
+                        role: result.user.role,
+                        loginTime: new Date().toISOString()
+                    }));
+                    
+                    updateStatus('✅ Login successful! Redirecting...', 'success');
+                    showMessage('🎉 Welcome ' + result.user.username + '!', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                    
+                } else {
+                    updateStatus('❌ Login failed', 'error');
+                    showMessage('❌ ' + result.message, 'error');
+                }
+                
+            } catch (error) {
+                updateStatus('❌ Network error', 'error');
+                showMessage('❌ Login error: ' + error.message, 'error');
+                console.error('❌ Login error:', error);
+            } finally {
+                loginBtn.innerHTML = '🚪 Login to Dashboard';
+                loginBtn.disabled = false;
+            }
+        }
+
+        // Auto test connection when page loads
+        window.addEventListener('load', function() {
+            console.log('🚀 Page loaded, testing backend connection...');
+            testConnection();
+        });
+
+        // Enter key support
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                login();
+            }
+        });
+
+        // Check if already logged in
+        const currentSession = JSON.parse(sessionStorage.getItem('adminSession'));
+        if (currentSession && currentSession.loggedIn) {
+            updateStatus('🔓 Already logged in as ' + currentSession.username, 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
