@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f8f9fa; min-height: 100vh;
+        }
+        .header { 
+            background: #2c3e50; color: white; padding: 20px 30px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .container { padding: 30px; max-width: 1000px; margin: 0 auto; }
+        .card { 
+            background: white; padding: 30px; border-radius: 10px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px;
+        }
+        .btn { 
+            background: #667eea; color: white; border: none; padding: 12px 20px; 
+            border-radius: 6px; cursor: pointer; font-weight: 600;
+        }
+        .btn-danger { background: #dc3545; }
+        .user-info { color: #bdc3c7; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔗 Admin Dashboard</h1>
+        <div class="user-info" id="userInfo">Loading...</div>
+        <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
+    </div>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Welcome to Admin Panel</h2>
+            <p>You have successfully logged in to the system.</p>
+            <div style="margin-top: 20px;">
+                <p><strong>Username:</strong> <span id="displayUsername"></span></p>
+                <p><strong>Role:</strong> <span id="displayRole"></span></p>
+                <p><strong>Login Time:</strong> <span id="loginTime"></span></p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Quick Actions</h2>
+            <button class="btn" onclick="createLink()">🔗 Create New Link</button>
+            <button class="btn" style="background: #28a745; margin-left: 10px;">📊 View Analytics</button>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const currentSession = JSON.parse(sessionStorage.getItem('adminSession'));
+        if (!currentSession || !currentSession.loggedIn) {
+            window.location.href = 'index.html';
+            throw new Error('Not authenticated');
+        }
+
+        // Display user info
+        document.getElementById('userInfo').textContent = `Welcome, ${currentSession.username}`;
+        document.getElementById('displayUsername').textContent = currentSession.username;
+        document.getElementById('displayRole').textContent = currentSession.role;
+        document.getElementById('loginTime').textContent = new Date(currentSession.loginTime).toLocaleString();
+
+        function logout() {
+            sessionStorage.removeItem('adminSession');
+            window.location.href = 'index.html';
+        }
+
+        function createLink() {
+            alert('Create link functionality coming soon!');
+        }
+
+        console.log('Dashboard loaded for:', currentSession.username);
+    </script>
+</body>
+</html>
